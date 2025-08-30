@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  image        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  companies    Company[]
+  contacts     Contact[]
+
+  @@map("users")
+}
+
+model Company {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  website      String?
+  industry     String?
+  size         String?
+  location     String?
+  logo         String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String
+  applications Application[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts     Contact[]
+
+  @@map("companies")
+}
+
+model Contact {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String?
+  phone        String?
+  position     String?
+  linkedin     String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String
+  companyId    String
+  applications Application[]
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contacts")
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  title       String
+  description String?
+  status      ApplicationStatus @default(APPLIED)
+  priority    Priority          @default(MEDIUM)
+  salary      Int?
+  location    String?
+  jobType     JobType?
+  source      String?
+  jobUrl      String?
+  appliedAt   DateTime?
+  responseAt  DateTime?
+  interviewAt DateTime?
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  userId      String
+  companyId   String
+  contactId   String?
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact     Contact?          @relation(fields: [contactId], references: [id])
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("applications")
+}
+
+enum ApplicationStatus {
+  APPLIED
+  REVIEWING
+  PHONE_SCREEN
+  TECHNICAL_TEST
+  INTERVIEW
+  FINAL_INTERVIEW
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+  INTERNSHIP
+}
