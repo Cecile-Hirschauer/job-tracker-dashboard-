@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get PR info
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const { context } = require('@actions/github');
@@ -114,7 +114,7 @@ jobs:
           working-directory: ./
 
       - name: Comment Preview URL
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const previewUrl = '${{ steps.deploy-preview.outputs.preview-url }}';
